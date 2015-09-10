@@ -22,12 +22,15 @@ public class Receiver extends HttpServlet {
     public final static String botName = "KadseBot";
 
     private String message;
-    int ohKadseDate = 0;
+
+
+    Functions functions;
 
     public void init() throws ServletException
     {
         // Do required initialization
         message = "Hello World";
+        functions = new Functions();
     }
 
 
@@ -37,14 +40,11 @@ public class Receiver extends HttpServlet {
         //System.out.print("Test");
 
         StringBuilder sb = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        try {
+        try (BufferedReader reader = request.getReader()) {
             String line;
             while ((line = reader.readLine()) != null) {
                 sb.append(line).append('\n');
             }
-        } finally {
-            reader.close();
         }
 
         try {
@@ -53,17 +53,17 @@ public class Receiver extends HttpServlet {
             JSONObject message = jsonObject.getJSONObject("message");
             String command = message.getString("text");
             if(BotHelper.command(command,"/echo")) {
-                Functions.echo(jsonObject);
+                functions.echo(jsonObject);
             }else if(BotHelper.command(command,"/engage")){
-                Functions.engage(jsonObject);
+                functions.engage(jsonObject);
             }else if(BotHelper.command(command,"/debug")){
-                Functions.debugjson(jsonObject);
+                functions.debugjson(jsonObject);
             }else if(BotHelper.command(command,"/amazon")){
-                Functions.searchAmazon(jsonObject);
+                functions.searchAmazon(jsonObject);
             }else if (BotHelper.command(command, "/decide")){
-                Functions.decide(jsonObject);
+                functions.decide(jsonObject);
             }else if(BotHelper.command(command,"/ohkadsewasessenwirheute")){
-                Functions.ohkadsewasessenwirheute(jsonObject,oKadse());
+                functions.ohkadsewasessenwirheute(jsonObject);
             }
 
         }catch (Exception e){
@@ -74,13 +74,6 @@ public class Receiver extends HttpServlet {
     }
 
 
-    private boolean oKadse(){
-        if(ohKadseDate != new Date().getDay()){
-            ohKadseDate = new Date().getDay();
-            return true;
-        }
-        return false;
-    }
 
 
     public void destroy()

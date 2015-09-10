@@ -13,10 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by xilent on 28.06.15.
@@ -24,7 +21,10 @@ import java.util.Random;
 public class Functions {
     public static String charset = "UTF-8";
 
-    public static void echo( JSONObject JSONInput){
+    int ohKadseDate = 0;
+    int ohKadseCounter = 0;
+
+    public void echo( JSONObject JSONInput){
         new Thread(() -> {
             try {
                 JSONObject message = JSONInput.getJSONObject("message");
@@ -63,7 +63,7 @@ public class Functions {
 
     }
 
-    public static void debugjson( JSONObject JSONInput){
+    public void debugjson( JSONObject JSONInput){
         new Thread(() -> {
             try {
                 JSONObject message = JSONInput.getJSONObject("message");
@@ -88,7 +88,7 @@ public class Functions {
 
     }
 
-    public static void searchAmazon(JSONObject JSONInput){
+    public void searchAmazon(JSONObject JSONInput){
         String url = "http://www.amazon.de/s/field-keywords=";
         String output= "";
 
@@ -153,7 +153,7 @@ public class Functions {
 
     }
 
-    public static void engage( JSONObject JSONInput){
+    public void engage( JSONObject JSONInput){
         new Thread(() -> {
             try {
                 JSONObject message = JSONInput.getJSONObject("message");
@@ -189,26 +189,23 @@ public class Functions {
 
     }
 
-    public static void decide(JSONObject JSONInput){
+    public void decide(JSONObject JSONInput){
 
         new Thread(() -> {
             try {
                 JSONObject message = JSONInput.getJSONObject("message");
-                JSONObject chat = message.getJSONObject("chat");
-                System.out.println(chat.get("id"));
 
                 String text = message.getString("text");
                 List<String> params = BotHelper.getParameters(text, "/decide");
 
                 if(params.size() >0) {
 
-                    String result = params.get(generateRandomNumber(0, params.size() - 1));
 
-                    String response = "Ergebnis: " + result;
+                    String response = "Ergebnis: " + params.get(generateRandomNumber(0, params.size() - 1));
 
 
                     String query = String.format("/sendMessage?chat_id=%s&text=%s",
-                            URLEncoder.encode(String.valueOf(chat.getInt("id")), charset),
+                            URLEncoder.encode(String.valueOf(message.getJSONObject("chat").getInt("id")), charset),
                             URLEncoder.encode( response, charset));
                     System.out.println(query);
 
@@ -220,7 +217,7 @@ public class Functions {
 
                     con.getResponseCode();
                 }else{
-                    sendUsageMessage("/decide","/decide option1 option2 ...",String.valueOf(chat.getInt("id")));
+                    sendUsageMessage("/decide","/decide option1 option2 ...",String.valueOf(message.getJSONObject("chat").getInt("id")));
                 }
             }catch (IOException e){
                 e.printStackTrace();
@@ -228,18 +225,33 @@ public class Functions {
         }).start();
     }
 
-    public static void ohkadsewasessenwirheute(JSONObject JSONInput, boolean oKadse){
-        if(oKadse) {
+    public void ohkadsewasessenwirheute(JSONObject JSONInput){
+        int ohKadseResponse = oKadse();
+        if(ohKadseResponse == 0) {
             JSONInput.getJSONObject("message").remove("text");
             JSONInput.getJSONObject("message").put("text", "/decide Penny Smileys Mensa");
             decide(JSONInput);
-        }else{
+        }else if (ohKadseResponse > 0 && ohKadseResponse < 3){
             sendMessage("Kadse müde, Kadse schlafen",String.valueOf(JSONInput.getJSONObject("message").getJSONObject("chat").getInt("id")));
+        }else{
+            String username = "";
+            try{
+                username = JSONInput.getJSONObject("message").getJSONObject("from").getString("username");
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            if(username.length() > 1) {
+                sendMessage("Ob du behindert bist @" + username +" . Kadse hat entschieden", String.valueOf(JSONInput.getJSONObject("message").getJSONObject("chat").getInt("id")));
+            }else{
+                sendMessage("Ob du behindert bist. Kadse hat entschieden", String.valueOf(JSONInput.getJSONObject("message").getJSONObject("chat").getInt("id")));
+            }
         }
+
 
     }
 
-    public static void sendMessage(String Message,String chatID){
+    public void sendMessage(String Message,String chatID){
         try {
             String query = String.format("/sendMessage?chat_id=%s&text=%s",
                     URLEncoder.encode(chatID, charset),
@@ -259,7 +271,7 @@ public class Functions {
         }
     }
 
-    public static void sendErrorMessage(String ErrorMessage,String chatID){
+    public void sendErrorMessage(String ErrorMessage,String chatID){
         try {
             String query = String.format("/sendMessage?chat_id=%s&text=%s",
                     URLEncoder.encode(chatID, charset),
@@ -279,7 +291,7 @@ public class Functions {
         }
     }
 
-    public static void sendUsageMessage(String command,String UsageMessage,String chatID){
+    public void sendUsageMessage(String command,String UsageMessage,String chatID){
         try {
             String query = String.format("/sendMessage?chat_id=%s&text=%s",
                     URLEncoder.encode(chatID, charset),
@@ -299,10 +311,22 @@ public class Functions {
         }
     }
 
-    private static int generateRandomNumber(int min, int max){
+    private int generateRandomNumber(int min, int max){
 
         return new Random().nextInt((max - min) + 1) + min;
 
+    }
+
+
+    private int oKadse(){
+        if(ohKadseDate != new Date().getDay()){
+            ohKadseDate = new Date().getDay();
+            ohKadseCounter = 0;
+            return ohKadseCounter;
+        }else{
+            ohKadseCounter ++;
+            return ohKadseCounter;
+        }
     }
 
 

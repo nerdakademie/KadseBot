@@ -1,0 +1,53 @@
+apply plugin: "java"
+apply plugin: "war"
+
+def tomcatHome = "/usr/share/tomcat8"
+def homePath = System.properties['user.home']
+
+repositories {
+   mavenCentral()
+   jcenter()
+}
+
+dependencies{
+    compile 'javax.servlet:javax.servlet-api:3.+'
+    compile 'org.json:json:20141113'
+    compile 'org.jsoup:jsoup:1.8.2'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
+            srcDir 'src/main/java'
+            srcDir 'src/main/webapp'
+        }
+    }
+}
+
+task enableGradleDaemon<< {
+    def gradleDaemon = new File("${homePath}/.gradle/gradle.properties")
+    gradleDaemon.text = "org.gradle.daemon=true"
+}
+
+
+task deploylocal(dependsOn: build) << {
+    println "Copy from ${libsDir.getPath()} into ${tomcatHome}/webapps"
+    copy{
+        from libsDir
+        into "${tomcatHome}/webapps"
+        include '*.war'
+    }
+}
+
+task copyToRemote(type: Exec) {
+    commandLine 'curl', '--upload-file','build/libs/KadseBot.war','https://user:pw@url'
+}
+
+task deployRemote(dependsOn: build) << {
+    copyToRemote
+
+}

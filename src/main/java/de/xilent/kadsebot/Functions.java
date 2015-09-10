@@ -228,11 +228,35 @@ public class Functions {
         }).start();
     }
 
-    public static void ohkadsewasessenwirheute(JSONObject JSONInput){
-        JSONInput.getJSONObject("message").remove("text");
-        JSONInput.getJSONObject("message").put("text","/decide Penny Smileys Mensa");
-        decide(JSONInput);
+    public static void ohkadsewasessenwirheute(JSONObject JSONInput, boolean oKadse){
+        if(oKadse) {
+            JSONInput.getJSONObject("message").remove("text");
+            JSONInput.getJSONObject("message").put("text", "/decide Penny Smileys Mensa");
+            decide(JSONInput);
+        }else{
+            sendMessage("Kadse müde, Kadse schlafen",String.valueOf(JSONInput.getJSONObject("message").getJSONObject("chat").getInt("id")));
+        }
 
+    }
+
+    public static void sendMessage(String Message,String chatID){
+        try {
+            String query = String.format("/sendMessage?chat_id=%s&text=%s",
+                    URLEncoder.encode(chatID, charset),
+                    URLEncoder.encode(Message, charset));
+
+
+            URL obj = new URL(Receiver.botURL + query);
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+            // optional default is GET
+            con.setRequestMethod("GET");
+
+
+            con.getResponseCode();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
     public static void sendErrorMessage(String ErrorMessage,String chatID){

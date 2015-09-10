@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -21,6 +22,7 @@ public class Receiver extends HttpServlet {
     public final static String botName = "KadseBot";
 
     private String message;
+    int ohKadseDate = 0;
 
     public void init() throws ServletException
     {
@@ -61,7 +63,7 @@ public class Receiver extends HttpServlet {
             }else if (BotHelper.command(command, "/decide")){
                 Functions.decide(jsonObject);
             }else if(BotHelper.command(command,"/ohkadsewasessenwirheute")){
-                Functions.ohkadsewasessenwirheute(jsonObject);
+                Functions.ohkadsewasessenwirheute(jsonObject,oKadse());
             }
 
         }catch (Exception e){
@@ -69,6 +71,15 @@ public class Receiver extends HttpServlet {
         }
 
 
+    }
+
+
+    private boolean oKadse(){
+        if(ohKadseDate != new Date().getDay()){
+            ohKadseDate = new Date().getDay();
+            return true;
+        }
+        return false;
     }
 
 

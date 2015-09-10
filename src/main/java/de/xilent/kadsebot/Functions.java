@@ -21,8 +21,8 @@ import java.util.*;
 public class Functions {
     public static String charset = "UTF-8";
 
-    int ohKadseDate = 0;
-    int ohKadseCounter = 0;
+
+    HashMap<Integer,int[]> ohKadseChatCounter;
 
     public void echo( JSONObject JSONInput){
         new Thread(() -> {
@@ -39,6 +39,7 @@ public class Functions {
                     StringBuilder builder = new StringBuilder();
                     for(String s : params) {
                         builder.append(s);
+                        builder.append(" ");
                     }
 
                     String query = String.format("/sendMessage?chat_id=%s&text=%s",
@@ -226,13 +227,14 @@ public class Functions {
     }
 
     public void ohkadsewasessenwirheute(JSONObject JSONInput){
-        int ohKadseResponse = oKadse();
+        int chat_id=JSONInput.getJSONObject("message").getJSONObject("chat").getInt("id");
+        int ohKadseResponse = oKadse(chat_id);
         if(ohKadseResponse == 0) {
             JSONInput.getJSONObject("message").remove("text");
             JSONInput.getJSONObject("message").put("text", "/decide Penny Smileys Mensa");
             decide(JSONInput);
         }else if (ohKadseResponse > 0 && ohKadseResponse < 3){
-            sendMessage("Kadse müde, Kadse schlafen",String.valueOf(JSONInput.getJSONObject("message").getJSONObject("chat").getInt("id")));
+            sendMessage("Kadse müde, Kadse schlafen",String.valueOf(chat_id));
         }else{
             String username = "";
             try{
@@ -318,15 +320,23 @@ public class Functions {
     }
 
 
-    private int oKadse(){
-        if(ohKadseDate != new Date().getDay()){
-            ohKadseDate = new Date().getDay();
-            ohKadseCounter = 0;
-            return ohKadseCounter;
-        }else{
-            ohKadseCounter ++;
-            return ohKadseCounter;
+    private int oKadse(int ChatID){
+        if(ohKadseChatCounter == null){
+            ohKadseChatCounter = new HashMap<>();
         }
+        if(!ohKadseChatCounter.containsKey(ChatID)){
+            ohKadseChatCounter.put(ChatID,new int[]{new GregorianCalendar().get(Calendar.DAY_OF_MONTH), 0});
+            return ohKadseChatCounter.get(ChatID)[1];
+        }else{
+            if(ohKadseChatCounter.get(ChatID)[0] != new GregorianCalendar().get(Calendar.DAY_OF_MONTH)){
+                ohKadseChatCounter.put(ChatID,new int[]{new  GregorianCalendar().get(Calendar.DAY_OF_MONTH),0});
+                return ohKadseChatCounter.get(ChatID)[1];
+            }else{
+                ohKadseChatCounter.put(ChatID,new int[]{ohKadseChatCounter.get(ChatID)[0], ohKadseChatCounter.get(ChatID)[1]+1});
+                return  ohKadseChatCounter.get(ChatID)[1];
+            }
+        }
+
     }
 
 

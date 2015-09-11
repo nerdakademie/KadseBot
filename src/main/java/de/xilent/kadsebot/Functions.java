@@ -34,7 +34,7 @@ public class Functions {
                 String text = message.getString("text");
                 List<String> params = BotHelper.getParameters(text, "/echo");
 
-                if(params.size() >0) {
+                if(params.size() > 0) {
 
                     StringBuilder builder = new StringBuilder();
                     for(String s : params) {
@@ -254,9 +254,50 @@ public class Functions {
     }
 
     public void ohmagischekadse(JSONObject JSONInput){
-            JSONInput.getJSONObject("message").remove("text");
-            JSONInput.getJSONObject("message").put("text", "/decide Ja Nein Vielleicht Frag-Später");
-            decide(JSONInput);
+        JSONInput.getJSONObject("message").remove("text");
+        JSONInput.getJSONObject("message").put("text", "/decide Ja Nein Vielleicht Frag-Später");
+        decide(JSONInput);
+    }
+
+    public void otherChat(JSONObject JSONInput){
+        new Thread(() -> {
+            try {
+                JSONObject message = JSONInput.getJSONObject("message");
+                JSONObject chat = message.getJSONObject("chat");
+                System.out.println(chat.get("id"));
+                String text = message.getString("text");
+                List<String> params = BotHelper.getParameters(text, "/otherchat");
+                if(params.size() > 1 && isInteger(params.get(0))) {
+
+                    StringBuilder builder = new StringBuilder();
+                    for(String s : params.subList(1,params.size())) {
+                        builder.append(s);
+                        builder.append(" ");
+                    }
+
+
+                    String query = String.format("/sendMessage?chat_id=%s&text=%s",
+                            URLEncoder.encode(params.get(0), charset),
+                            URLEncoder.encode(builder.toString(), charset));
+
+                    URL obj = new URL(Receiver.botURL + query);
+
+
+                    HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+                    // optional default is GET
+                    con.setRequestMethod("GET");
+                    con.getResponseCode();
+
+                }else if(params.size()>1){
+                    sendErrorMessage("You must enter at least 2 parameters. The first one has to be a chatID. Please dont abuse",String.valueOf(chat.getInt("id")));
+                }else{
+                    sendUsageMessage("/otherchat","/otherchat chatID Your Message here",String.valueOf(chat.getInt("id")));
+                }
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     public void sendMessage(String Message,String chatID){
@@ -280,7 +321,7 @@ public class Functions {
     }
 
     public void sendErrorMessage(String ErrorMessage,String chatID){
-        sendMessage("Error: " + ErrorMessage,chatID);
+        sendMessage("Error: " + ErrorMessage, chatID);
 
     }
 
@@ -314,5 +355,21 @@ public class Functions {
 
     }
 
+
+    public static boolean isInteger(String s) {
+        return isInteger(s,10);
+    }
+
+    public static boolean isInteger(String s, int radix) {
+        if(s.isEmpty()) return false;
+        for(int i = 0; i < s.length(); i++) {
+            if(i == 0 && s.charAt(i) == '-') {
+                if(s.length() == 1) return false;
+                else continue;
+            }
+            if(Character.digit(s.charAt(i),radix) < 0) return false;
+        }
+        return true;
+    }
 
 }

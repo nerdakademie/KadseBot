@@ -280,43 +280,12 @@ public class Functions {
     }
 
     public void sendErrorMessage(String ErrorMessage,String chatID){
-        try {
-            String query = String.format("/sendMessage?chat_id=%s&text=%s",
-                    URLEncoder.encode(chatID, charset),
-                    URLEncoder.encode("Error: " +ErrorMessage, charset));
+        sendMessage("Error: " + ErrorMessage,chatID);
 
-
-            URL obj = new URL(Receiver.botURL + query);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-            // optional default is GET
-            con.setRequestMethod("GET");
-
-
-            con.getResponseCode();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
     }
 
     public void sendUsageMessage(String command,String UsageMessage,String chatID){
-        try {
-            String query = String.format("/sendMessage?chat_id=%s&text=%s",
-                    URLEncoder.encode(chatID, charset),
-                    URLEncoder.encode(command + " Usage: " +UsageMessage, charset));
-
-
-            URL obj = new URL(Receiver.botURL + query);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-            // optional default is GET
-            con.setRequestMethod("GET");
-
-
-            con.getResponseCode();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+        sendMessage(command + " Usage: " + UsageMessage,chatID);
     }
 
     private int generateRandomNumber(int min, int max){

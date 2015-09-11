@@ -253,6 +253,12 @@ public class Functions {
 
     }
 
+    public void ohmagischekadse(JSONObject JSONInput){
+            JSONInput.getJSONObject("message").remove("text");
+            JSONInput.getJSONObject("message").put("text", "/decide Ja Nein Vieleicht Frag-Später");
+            decide(JSONInput);
+    }
+
     public void sendMessage(String Message,String chatID){
         try {
             String query = String.format("/sendMessage?chat_id=%s&text=%s",

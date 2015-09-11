@@ -64,6 +64,8 @@ public class Receiver extends HttpServlet {
                 functions.decide(jsonObject);
             }else if(BotHelper.command(command,"/ohkadsewasessenwirheute")){
                 functions.ohkadsewasessenwirheute(jsonObject);
+            }else if(BotHelper.command(command,"/ohmagischekadse")){
+                functions.ohmagischekadse(jsonObject);
             }
 
         }catch (Exception e){

@@ -255,7 +255,7 @@ public class Functions {
 
     public void ohmagischekadse(JSONObject JSONInput){
             JSONInput.getJSONObject("message").remove("text");
-            JSONInput.getJSONObject("message").put("text", "/decide Ja Nein Vieleicht Frag-Später");
+            JSONInput.getJSONObject("message").put("text", "/decide Ja Nein Vielleicht Frag-Später");
             decide(JSONInput);
     }
 

@@ -68,7 +68,12 @@ public class Receiver extends HttpServlet {
                 functions.ohmagischekadse(jsonObject);
             }else if(BotHelper.command(command,"/otherchat")){
                 functions.otherChat(jsonObject);
+            }else if((BotHelper.command(command,"/help"))||(BotHelper.command(command,"/?"))){
+                functions.help(jsonObject);
+            }else {
+                functions.unknown(jsonObject);
             }
+            
 
         }catch (Exception e){
             e.printStackTrace();

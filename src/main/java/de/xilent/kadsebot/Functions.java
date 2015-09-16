@@ -300,6 +300,14 @@ public class Functions {
         }).start();
     }
 
+    public void help(JSONObject jsonObject){
+            sendMessage("Possible commands: \n /echo \n /debug \n /ohkadsewasessenwirheute \n /ohmagischekadse \n /decide" ,jsonObject.getJSONObject("message").getJSONObject("chat").getInt("id"));
+    }
+
+    public void unknown(JSONObject jsonObject){
+            sendMessage("Kadse verwirrt, kadse kennt nicht." ,jsonObject.getJSONObject("message").getJSONObject("chat").getInt("id")); 
+    }
+
     public void sendMessage(String Message,String chatID){
         try {
             String query = String.format("/sendMessage?chat_id=%s&text=%s",

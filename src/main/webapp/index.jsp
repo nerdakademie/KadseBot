@@ -3,6 +3,6 @@
 </head>
 <body>
 	<script>
-	window.location.href = window.location.href + "bot/";
+	window.location.href = window.location.href + "receiver/";
 	</script>
 </body>

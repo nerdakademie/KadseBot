@@ -103,6 +103,7 @@ public class Receiver extends HttpServlet {
 			authCodes.remove(authcode);
 			GradesCheckContainer t = new GradesCheckContainer(userId, key);
 			checkGrades.add(t);
+			response.setContentType("text/html");
 			request.getRequestDispatcher("/WEB-INF/success.jsp").forward(request, response);
 			return;
 		}

@@ -179,14 +179,11 @@ public class Functions {
 								+ "Mit dem Autorisierungscode:" + authKey, charset));
 
 				URL obj = new URL(Receiver.botURL + query);
+				HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
-				for (int i = 0; i < 5; i++) {
-					HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-					// optional default is GET
-					con.setRequestMethod("GET");
-					con.getResponseCode();
-				}
+				// optional default is GET
+				con.setRequestMethod("GET");
+				con.getResponseCode();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

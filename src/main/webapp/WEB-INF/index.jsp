@@ -24,9 +24,10 @@
 						<!-- <img src="http://i.imgur.com/e07tg8R.png" class="coupon-img img-rounded">
 						 KadseBot Logo -->
 						<div class="col-md-12">
-							<form method="get" id="form" action="bot/">
-								<input name="authcode" id="authcode" class="form-control" type="text" placeholder="Authcode">
-								<input name="key" id="key" class="form-control" type="text" placeholder="fe_users_key"><hr>
+							<form method="get" id="form" action="">
+								<input name="authcode" id="authcode" class="form-control" type="text" placeholder="Authcode"><hr>
+								<input name="benutzername" id="benutzername" class="form-control" type="text" placeholder="Benutzername"> <input name="passwort" id="passwort" class="form-control" type="password" placeholder="Passwort">
+								<hr>
 								<input class="form-control" type="submit">
 							</form>
 						</div>

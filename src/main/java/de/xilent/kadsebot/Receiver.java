@@ -30,15 +30,18 @@ public class Receiver extends HttpServlet {
 	public final static String botName = "KadseBot";
 
 	List<GradesCheckContainer> checkGrades = new ArrayList<GradesCheckContainer>();
+	GradesThread checkThread = new GradesThread();
 	Functions functions;
 	static Receiver instance;
 	Map<String, Integer> authCodes = new HashMap<String, Integer>();
 	Map<String, File> nameToFile = new HashMap<String, File>();
+	List<Integer> registeredGrades = new ArrayList<Integer>();
 
 	public void init() throws ServletException {
 		// Do required initialization
 		instance = this;
 		functions = new Functions(this);
+		checkThread.start();
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -97,20 +100,24 @@ public class Receiver extends HttpServlet {
 			return;
 		}
 		String authcode = request.getParameter("authcode");
-		String key = request.getParameter("key");
+		String user = request.getParameter("benutzername");
+		String pass = request.getParameter("passwort");
 		if (authCodes.containsKey(authcode)) {
 			int userId = authCodes.get(authcode);
 			authCodes.remove(authcode);
-			GradesCheckContainer t = new GradesCheckContainer(userId, key);
+			GradesCheckContainer t = new GradesCheckContainer(userId, user, pass);
+			registeredGrades.add(userId);
 			checkGrades.add(t);
-			response.setContentType("text/html");
+			functions.sendMessage("KadseBot schnuppert jetzt hin und wieder mal in deinen Noten rum.", String.valueOf(userId));
 			request.getRequestDispatcher("/WEB-INF/success.jsp").forward(request, response);
+			response.setContentType("text/html");
 			return;
 		}
 		request.getRequestDispatcher("/WEB-INF/index.jsp").include(request, response);
+		response.setContentType("text/html");
 	}
 
 	public void destroy() {
-		
+		checkThread.interrupt();
 	}
 }

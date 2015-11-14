@@ -164,29 +164,20 @@ public class Functions {
 
 	public void grades(JSONObject JSONInput) {
 		new Thread(() -> {
-			try {
-				JSONObject message = JSONInput.getJSONObject("message");
-				JSONObject user = message.getJSONObject("from");
-				int id = user.getInt("id");
-				String authKey = nextAuthKey();
-				if (receiver.authCodes.containsKey(id))
-					receiver.authCodes.remove((Integer) id);
-				receiver.authCodes.put(authKey, id);
-
-				String query = String.format("/sendMessage?chat_id=%s&text=%s",
-						URLEncoder.encode(String.valueOf(id), charset),
-						URLEncoder.encode("Bitte autorisiere dich auf:\n" + "https://bot.michel-wohlert.de/bot/\n"
-								+ "Mit dem Autorisierungscode:" + authKey, charset));
-
-				URL obj = new URL(Receiver.botURL + query);
-				HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-				// optional default is GET
-				con.setRequestMethod("GET");
-				con.getResponseCode();
-			} catch (IOException e) {
-				e.printStackTrace();
+			JSONObject message = JSONInput.getJSONObject("message");
+			JSONObject user = message.getJSONObject("from");
+			int id = user.getInt("id");
+			if (receiver.registeredGrades.contains(id)) {
+				sendMessage("Ob du behindert bist? Habe ich nicht eben gesagt, dass ich schon in deinen Noten schnuppere?", String.valueOf(id));
+				return;
 			}
+			String authKey = nextAuthKey();
+			if (receiver.authCodes.containsKey(id))
+				receiver.authCodes.remove((Integer) id);
+			receiver.authCodes.put(authKey, id);
+
+			sendMessage("Bitte autorisiere dich auf:\n" + "https://bot.michel-wohlert.de/bot/\n"
+					+ "Mit dem Autorisierungscode:" + authKey, String.valueOf(id));
 		}).start();
 
 	}

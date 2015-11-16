@@ -23,7 +23,7 @@ import org.jsoup.select.Elements;
 
 public class GradesCheckContainer {
 
-	private int userID;
+	protected final int userID;
 	private final String user;
 	private final String pass;
 	private String url = "https://cis.nordakademie.de/pruefungsamt/pruefungsergebnisse/?no_cache=1";
@@ -31,12 +31,12 @@ public class GradesCheckContainer {
 	private Map<String, String> oldGrades = new HashMap<String, String>();
 	private final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36";
 	private List<String> cookies;
+	private CookieManager cookieManager = new CookieManager();
 
 	public GradesCheckContainer(int userID, String user, String pass) {
 		this.userID = userID;
 		this.user = user;
 		this.pass = pass;
-		CookieHandler.setDefault(new CookieManager());
 		try {
 			checkLoadOldGrades();
 		} catch (Exception e) {
@@ -47,8 +47,7 @@ public class GradesCheckContainer {
 	protected void checkForNewGrades() throws Exception {
 		login();
 		Map<String, String> newGrades = new HashMap<String, String>();
-		String content = getPageContent(url);
-		Map<String, String> grades = getGradesFromInput(content);
+		Map<String, String> grades = getGradesFromInput();
 		for (String key : grades.keySet()) {
 			String newGrade = grades.get(key);
 			if (newGrade.matches("\\s*"))
@@ -67,16 +66,19 @@ public class GradesCheckContainer {
 			String grade = "";
 			for (String s : newGrades.keySet())
 				grade += s + ": " + newGrades.get(s) + "\n";
+			if (grade.contains("*"))
+				grade += "\n*) Mündliche Nachprüfung möglich.";
 			Receiver.instance.functions.sendMessage("Du hast neue Noten:\n" + grade, String.valueOf(userID));
 		}
 	}
 
 	private void checkLoadOldGrades() throws Exception {
 		login();
-		oldGrades = getGradesFromInput(getPageContent(url));
+		oldGrades = getGradesFromInput();
 	}
 
-	private void login() throws Exception {
+	private void login() throws IOException {
+		CookieHandler.setDefault(cookieManager);
 		if (this.cookies != null)
 			return;
 		String page = getPageContent(url_login);
@@ -85,11 +87,10 @@ public class GradesCheckContainer {
 		sendPost(url_login, postParams);
 	}
 
-	private Map<String, String> getGradesFromInput(String content) throws IOException {
+	private Map<String, String> getGradesFromInput() throws IOException {
+		String content = getPageContent(url);
 		HashMap<String, String> ret = new HashMap<String, String>();
 		Document doc = Jsoup.parse(content);
-
-		// Google form id
 		Element loginform = doc.getElementsByClass("table").get(0);
 		Elements trElements = loginform.getElementsByTag("tr");
 		for (Element trElement : trElements) {
@@ -105,12 +106,15 @@ public class GradesCheckContainer {
 				}
 				i++;
 			}
+			if (grade.contains("(m)")) {
+				grade = grade.substring(0, 3) + "*";
+			}
 			ret.put(module, grade);
 		}
 		return ret;
 	}
 
-	private void sendPost(String url, String postParams) throws Exception {
+	private void sendPost(String url, String postParams) throws IOException {
 
 		URL obj = new URL(url);
 		HttpsURLConnection conn = (HttpsURLConnection) obj.openConnection();
@@ -157,7 +161,7 @@ public class GradesCheckContainer {
 		setCookies(conn.getHeaderFields().get("Set-Cookie"));
 	}
 
-	private String getPageContent(String url) throws Exception {
+	private String getPageContent(String url) throws IOException {
 
 		URL obj = new URL(url);
 		HttpsURLConnection conn = (HttpsURLConnection) obj.openConnection();

@@ -21,11 +21,14 @@
 						</div>
 					</div>
 					<div class="panel-body">
-						<!-- <img src="http://i.imgur.com/e07tg8R.png" class="coupon-img img-rounded">
-						 KadseBot Logo -->
+						<!-- KadseBot Logo -->
+						<div class="text-center">
+							<img src="../img/kadse.jpg" class="coupon-img img-rounded">
+						</div>
 						<div class="col-md-12">
 							<form method="get" id="form" action="">
-								<input name="authcode" id="authcode" class="form-control" type="text" placeholder="Authcode"><hr>
+								<input name="authcode" id="authcode" class="form-control" type="text" placeholder="Authcode">
+								<hr>
 								<input name="benutzername" id="benutzername" class="form-control" type="text" placeholder="Benutzername"> <input name="passwort" id="passwort" class="form-control" type="password" placeholder="Passwort">
 								<hr>
 								<input class="form-control" type="submit">
@@ -33,7 +36,9 @@
 						</div>
 					</div>
 					<div class="panel-footer">
-						<div class="exp">Made with <i class="glyphicon glyphicon-heart-empty"></i> and <i class="glyphicon glyphicon-tree-deciduous"></i></div>
+						<div class="exp">
+							Made with <i class="glyphicon glyphicon-heart-empty"></i> and <i style="color: green;" class="glyphicon glyphicon-tree-deciduous"></i>
+						</div>
 					</div>
 				</div>
 			</div>

@@ -119,5 +119,9 @@ public class Receiver extends HttpServlet {
 
 	public void destroy() {
 		checkThread.interrupt();
+		for(GradesCheckContainer c : this.checkGrades) {
+			functions.sendMessage("Kadse müde, Kadse schlafen.", String.valueOf(c.userID));
+		}
+			
 	}
 }

@@ -68,9 +68,7 @@ public class Receiver extends HttpServlet {
 				functions.engage(jsonObject);
 			} else if (BotHelper.command(command, "/debug")) {
 				functions.debugjson(jsonObject);
-			} else if (BotHelper.command(command, "/amazon")) {
-				functions.searchAmazon(jsonObject);
-			} else if (BotHelper.command(command, "/decide")) {
+			}  else if (BotHelper.command(command, "/decide")) {
 				functions.decide(jsonObject);
 			} else if (BotHelper.command(command, "/ohkadsewasessenwirheute")) {
 				functions.ohkadsewasessenwirheute(jsonObject);
@@ -82,7 +80,10 @@ public class Receiver extends HttpServlet {
 				functions.help(jsonObject);
 			} else if ((BotHelper.command(command, "/grades"))) {
 				functions.grades(jsonObject);
-			} else {
+			} else if ((BotHelper.command(command, "/catme"))){
+
+			}
+			else {
 				functions.unknown(jsonObject);
 			}
 
@@ -120,7 +121,7 @@ public class Receiver extends HttpServlet {
 	public void destroy() {
 		checkThread.interrupt();
 		for(GradesCheckContainer c : this.checkGrades) {
-			functions.sendMessage("Kadse müde, Kadse schlafen.", String.valueOf(c.userID));
+			functions.sendMessage("Kadse mï¿½de, Kadse schlafen.", String.valueOf(c.userID));
 		}
 			
 	}

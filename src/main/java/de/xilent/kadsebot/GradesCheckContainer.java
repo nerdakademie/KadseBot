@@ -67,7 +67,7 @@ public class GradesCheckContainer {
 			for (String s : newGrades.keySet())
 				grade += s + ": " + newGrades.get(s) + "\n";
 			if (grade.contains("*"))
-				grade += "\n*) Mündliche Nachprüfung möglich.";
+				grade += "\n*) Muendliche Nachpruefung moeglich.";
 			Receiver.instance.functions.sendMessage("Du hast neue Noten:\n" + grade, String.valueOf(userID));
 		}
 	}

@@ -36,129 +36,38 @@ public class Functions {
 
 	public void echo(JSONObject JSONInput) {
 		new Thread(() -> {
-			try {
-				JSONObject message = JSONInput.getJSONObject("message");
-				JSONObject chat = message.getJSONObject("chat");
-				System.out.println(chat.get("id"));
+			JSONObject message = JSONInput.getJSONObject("message");
+			JSONObject chat = message.getJSONObject("chat");
 
-				String text = message.getString("text");
-				List<String> params = BotHelper.getParameters(text, "/echo");
+			String text = message.getString("text");
+			List<String> params = BotHelper.getParameters(text, "/echo");
 
-				if (params.size() > 0) {
+			if (params.size() > 0) {
 
-					StringBuilder builder = new StringBuilder();
-					for (String s : params) {
-						builder.append(s);
-						builder.append(" ");
-					}
-
-					String query = String.format("/sendMessage?chat_id=%s&text=%s",
-							URLEncoder.encode(String.valueOf(chat.getInt("id")), charset),
-							URLEncoder.encode(builder.toString(), charset));
-					System.out.println(query);
-
-					URL obj = new URL(Receiver.botURL + query);
-					HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-					// optional default is GET
-					con.setRequestMethod("GET");
-
-					con.getResponseCode();
-				} else {
-					sendUsageMessage("/echo", "/echo yourtextgoeshere", String.valueOf(chat.getInt("id")));
+				StringBuilder builder = new StringBuilder();
+				for (String s : params) {
+					builder.append(s);
+					builder.append(" ");
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
+
+				sendMessage(builder.toString(),String.valueOf(chat.getInt("id")));
+
+			} else {
+				sendUsageMessage("/echo", "/echo yourtextgoeshere", String.valueOf(chat.getInt("id")));
 			}
+
 		}).start();
 
 	}
 
 	public void debugjson(JSONObject JSONInput) {
 		new Thread(() -> {
-			try {
-				JSONObject message = JSONInput.getJSONObject("message");
-				JSONObject chat = message.getJSONObject("chat");
+			JSONObject message = JSONInput.getJSONObject("message");
+			JSONObject chat = message.getJSONObject("chat");
 
-				// String text = message.getString("text");
+			sendMessage(JSONInput.toString(),String.valueOf(chat.getInt("id")));
 
-				String query = String.format("/sendMessage?chat_id=%s&text=%s",
-						URLEncoder.encode(String.valueOf(chat.getInt("id")), charset),
-						URLEncoder.encode(JSONInput.toString(), charset));
-
-				URL obj = new URL(Receiver.botURL + query);
-				HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-				// optional default is GET
-				con.setRequestMethod("GET");
-				con.getResponseCode();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}).start();
-
-	}
-
-	public void searchAmazon(JSONObject JSONInput) {
-		String url = "http://www.amazon.de/s/field-keywords=";
-		String output = "";
-
-		JSONObject message = JSONInput.getJSONObject("message");
-		JSONObject chat = message.getJSONObject("chat");
-
-		String text = message.getString("text");
-		List<String> params = BotHelper.getParameters(text, "/amazon");
-
-		try {
-			if (params.size() > 0) {
-
-				StringBuilder builder = new StringBuilder();
-				for (String s : params) {
-					builder.append(s + " ");
-				}
-				Document document = Jsoup.connect(url + builder.toString()).get();
-				Elements headerInfo = document.select("ul[id=s-results-list-atf]");
-				// check results
-				for (org.jsoup.nodes.Element each : headerInfo) {
-
-					Elements list = each.select("li");
-
-					for (Element eachli : list) {
-						Elements link = eachli.select("a[class=a-link-normal s-access-detail-page  a-text-normal]");
-						if (link.attr("title").length() > 2) {
-							// output = output + link.attr("title") + " : " +
-							// link.attr("href") + "\n";
-							Document document2 = Jsoup.connect(link.attr("href")).get();
-							Elements tradein = document2.select("span[id=tradeInButton_tradeInValueLine]");
-							if (tradein.size() > 0) {
-								Elements spanPrice = tradein.select("span[class=a-text-bold]");
-								System.out.println(spanPrice.get(0).html());
-								output = output + link.attr("title") + " : " + spanPrice.get(0).html() + " | "
-										+ link.attr("href") + "\n";
-							}
-
-						}
-					}
-				}
-
-				if (output.length() < 5) {
-					output = "No search results for: " + builder.toString();
-				}
-				String query = String.format("/sendMessage?chat_id=%s&text=%s",
-						URLEncoder.encode(String.valueOf(chat.getInt("id")), charset),
-						URLEncoder.encode(output, charset));
-
-				URL obj = new URL(Receiver.botURL + query);
-				HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-				// optional default is GET
-				con.setRequestMethod("GET");
-				con.getResponseCode();
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
 	}
 
@@ -184,7 +93,6 @@ public class Functions {
 
 	public void engage(JSONObject JSONInput) {
 		new Thread(() -> {
-			try {
 				JSONObject message = JSONInput.getJSONObject("message");
 				JSONObject chat = message.getJSONObject("chat");
 				System.out.println(chat.get("id"));
@@ -192,18 +100,11 @@ public class Functions {
 				List<String> params = BotHelper.getParameters(text, "/engage");
 
 				if (params.size() == 1) {
-					String query = String.format("/sendMessage?chat_id=%s&text=%s",
-							URLEncoder.encode(String.valueOf(chat.getInt("id")), charset),
-							URLEncoder.encode("Meow " + params.get(0), charset));
-
-					URL obj = new URL(Receiver.botURL + query);
 
 					for (int i = 0; i < 5; i++) {
-						HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
-						// optional default is GET
-						con.setRequestMethod("GET");
-						con.getResponseCode();
+						sendMessage("Meow " +params.get(0),String.valueOf(chat.getInt("id")));
+
 					}
 				} else if (params.size() > 1) {
 					sendErrorMessage("You must enter one parameter. Not less not more",
@@ -211,9 +112,6 @@ public class Functions {
 				} else {
 					sendUsageMessage("/engage", "/engage @UserName", String.valueOf(chat.getInt("id")));
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}).start();
 
 	}
@@ -289,7 +187,7 @@ public class Functions {
 
 	public void otherChat(JSONObject JSONInput) {
 		new Thread(() -> {
-			try {
+		//	try {
 				JSONObject message = JSONInput.getJSONObject("message");
 				JSONObject chat = message.getJSONObject("chat");
 				System.out.println(chat.get("id"));
@@ -303,16 +201,7 @@ public class Functions {
 						builder.append(" ");
 					}
 
-					String query = String.format("/sendMessage?chat_id=%s&text=%s",
-							URLEncoder.encode(params.get(0), charset), URLEncoder.encode(builder.toString(), charset));
-
-					URL obj = new URL(Receiver.botURL + query);
-
-					HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-					// optional default is GET
-					con.setRequestMethod("GET");
-					con.getResponseCode();
+					sendMessage(builder.toString(),params.get(0));
 
 				} else if (params.size() > 1) {
 					sendErrorMessage(
@@ -322,11 +211,10 @@ public class Functions {
 					sendUsageMessage("/otherchat", "/otherchat chatID Your Message here",
 							String.valueOf(chat.getInt("id")));
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+
 		}).start();
 	}
+
 
 	public void help(JSONObject jsonObject) {
 		sendMessage("Possible commands: \n /echo \n /debug \n /ohkadsewasessenwirheute \n /ohmagischekadse \n /decide",
@@ -413,5 +301,6 @@ public class Functions {
 	public static String nextAuthKey() {
 		return String.valueOf(random.nextInt((9999) + 1));
 	}
+
 
 }

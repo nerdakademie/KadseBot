@@ -81,7 +81,7 @@ public class Receiver extends HttpServlet {
 			} else if ((BotHelper.command(command, "/grades"))) {
 				functions.grades(jsonObject);
 			} else if ((BotHelper.command(command, "/catme"))){
-
+				functions.catme(jsonObject);
 			}
 			else {
 				functions.unknown(jsonObject);

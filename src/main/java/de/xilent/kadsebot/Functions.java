@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+import de.xilent.kadsebot.helper.XMLParser;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,6 +20,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import de.xilent.kadsebot.helper.BotHelper;
+import org.w3c.dom.NodeList;
 
 /**
  * Created by xilent on 28.06.15.
@@ -119,35 +121,21 @@ public class Functions {
 	public void decide(JSONObject JSONInput) {
 
 		new Thread(() -> {
-			try {
-				JSONObject message = JSONInput.getJSONObject("message");
+			JSONObject message = JSONInput.getJSONObject("message");
 
-				String text = message.getString("text");
-				List<String> params = BotHelper.getParameters(text, "/decide");
+			String text = message.getString("text");
+			List<String> params = BotHelper.getParameters(text, "/decide");
 
-				if (params.size() > 0) {
+			if (params.size() > 0) {
 
-					String response = "Ergebnis: " + params.get(generateRandomNumber(0, params.size() - 1));
+				String response = "Ergebnis: " + params.get(generateRandomNumber(0, params.size() - 1));
+				sendMessage(response,String.valueOf(message.getJSONObject("chat").getInt("id")));
 
-					String query = String.format("/sendMessage?chat_id=%s&text=%s",
-							URLEncoder.encode(String.valueOf(message.getJSONObject("chat").getInt("id")), charset),
-							URLEncoder.encode(response, charset));
-					System.out.println(query);
-
-					URL obj = new URL(Receiver.botURL + query);
-					HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-					// optional default is GET
-					con.setRequestMethod("GET");
-
-					con.getResponseCode();
-				} else {
-					sendUsageMessage("/decide", "/decide option1 option2 ...",
+			} else {
+				sendUsageMessage("/decide", "/decide option1 option2 ...",
 							String.valueOf(message.getJSONObject("chat").getInt("id")));
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
+
 		}).start();
 	}
 
@@ -215,15 +203,28 @@ public class Functions {
 		}).start();
 	}
 
-
 	public void help(JSONObject jsonObject) {
 		sendMessage("Possible commands: \n /echo \n /debug \n /ohkadsewasessenwirheute \n /ohmagischekadse \n /decide",
 				String.valueOf(jsonObject.getJSONObject("message").getJSONObject("chat").getInt("id")));
 	}
 
 	public void unknown(JSONObject jsonObject) {
-		sendMessage("Kadse verwirrt, kadse kennt nicht.",
+		sendMessage("Kadse verwirrt, Kadse kennt nicht.",
 				String.valueOf(jsonObject.getJSONObject("message").getJSONObject("chat").getInt("id")));
+	}
+
+	public void catme(JSONObject JSONInput){
+		new Thread(() -> {
+			JSONObject message = JSONInput.getJSONObject("message");
+
+			XMLParser xmlParser = new XMLParser();
+			String xml = xmlParser.getXmlFromUrl("http://thecatapi.com/api/images/get?format=xml");
+			if(xml.contains("<url>")){
+				sendMessage(getTagValue(xml,"url"),String.valueOf(message.getJSONObject("chat").getInt("id")));
+			}else{
+				sendErrorMessage("Could not load cat picture. Sorry",String.valueOf(message.getJSONObject("chat").getInt("id")));
+			}
+		}).start();
 	}
 
 	public void sendMessage(String Message, String chatID) {
@@ -302,5 +303,9 @@ public class Functions {
 		return String.valueOf(random.nextInt((9999) + 1));
 	}
 
+
+	public static String getTagValue(String xml, String tagName){
+		return xml.split("<"+tagName+">")[1].split("</"+tagName+">")[0];
+	}
 
 }

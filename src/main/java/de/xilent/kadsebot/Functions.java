@@ -144,7 +144,7 @@ public class Functions {
 		int ohKadseResponse = oKadse(chat_id);
 		if (ohKadseResponse == 0) {
 			JSONInput.getJSONObject("message").remove("text");
-			JSONInput.getJSONObject("message").put("text", "/decide Penny Smileys Mensa");
+			JSONInput.getJSONObject("message").put("text", "/decide Penny Smileys Mensa Dinos");
 			decide(JSONInput);
 		} else if (ohKadseResponse > 0 && ohKadseResponse < 3) {
 			sendMessage("Kadse müde, Kadse schlafen", String.valueOf(chat_id));
